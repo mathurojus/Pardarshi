@@ -105,42 +105,20 @@ TinyFish is the part that makes the audit **real** instead of simulated. All fou
 
 ## Architecture
 
-graph TD
-    %% Styling
-    classDef frontend fill:#1f2937,stroke:#374151,stroke-width:2px,color:#f9fafb;
-    classDef backend fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#f9fafb;
-    classDef agent fill:#581c87,stroke:#8b5cf6,stroke-width:2px,color:#f9fafb;
-    classDef pipeline fill:#065f46,stroke:#10b981,stroke-width:2px,color:#f9fafb;
-    classDef provider fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#f9fafb;
-    classDef storage fill:#374151,stroke:#6b7280,stroke-width:2px,color:#f9fafb;
-
-    %% Nodes
-    Dashboard["Dashboard (web/)"]:::frontend
-    FastAPI["FastAPI (app/main.py)"]:::backend
-    
-    sub-agent RootAgent["Google ADK Root Agent 'pardarshi'<br/>(app/agents/orchestrator.py)<br/>• Tools: run_audit, get_audit, list_audits, find_peer_sites"]:::agent
-    sub-agent PolicyAnalyst["Sub-agent: policy_analyst (Fetch)"]:::agent
-    sub-agent ComplaintWriter["Sub-agent: complaint_writer (Gemini)"]:::agent
-
-    Pipeline["Pipeline (app/pipeline.py)<br/>• Personas x Repeats (Run in Parallel)"]:::pipeline
-    
-    sub-agent TinyFish["TinyFish Provider<br/>(Browser | Agent | Fetch | Search)"]:::provider
-    sub-agent OpenSource["Open Source Provider<br/>(Playwright | httpx | DDG)"]:::provider
-
-    CaptureSchema["Capture Schema (app/capture)"]:::storage
-    MLStats["ML + Stats (app/ml, app/analysis.py)"]:::storage
-    AuditReport["AuditReport"]:::storage
-
-    %% Connections
-    Dashboard <-->|"REST + SSE"| FastAPI
-    FastAPI --> RootAgent
-    RootAgent --> PolicyAnalyst
-    RootAgent --> ComplaintWriter
-    RootAgent --> Pipeline
-    Pipeline --> TinyFish
-    Pipeline --> OpenSource
-    TinyFish & OpenSource --> CaptureSchema
-    CaptureSchema --> MLStats --> AuditReport
+```
+Dashboard (web/)  <-- REST + SSE -->  FastAPI (app/main.py)
+                                         |
+                        Google ADK  root agent "pardarshi"  (app/agents/orchestrator.py)
+                        |- tools: run_audit, get_audit, list_audits, find_peer_sites
+                        |- sub-agent policy_analyst   (Fetch)
+                        '- sub-agent complaint_writer (Gemini)
+                                         |
+              Pipeline (app/pipeline.py): personas x repeats, run in parallel
+                                         |
+        Provider layer  TinyFish (Browser | Agent | Fetch | Search)   <->   Open source (Playwright | httpx | DDG)
+                                         |
+        Capture schema (app/capture)  ->  ML + stats (app/ml, app/analysis.py)  ->  AuditReport
+```
 
 ## The ML, in detail
 
