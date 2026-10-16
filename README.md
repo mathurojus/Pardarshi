@@ -6,6 +6,12 @@
 
 Most "dark pattern" tools read one page. Pardarshi sends AI agents through the **whole** booking, checkout and cancellation flow as *different shoppers* (country, device, new vs returning), always **stopping before payment**, and then uses ML and statistics to report:
 
+<p align="center">
+  <a href="https://youtu.be/xR9-eA1mp7o">
+    <img src="https://img.youtube.com/vi/xR9-eA1mp7o/hqdefault.jpg" alt="Pardarshi Demo Video" width="480">
+  </a>
+</p>
+
 | Check | How it is measured |
 |---|---|
 | **Drip pricing** | Advertised price vs payable price, with every fee itemised (price waterfall) |
