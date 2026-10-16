@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Pardarshi">
+  <!-- The P is a magnifier: the bowl is the lens, the stem its handle. Inside the lens: a receipt line, and the hidden fee in marigold. -->
+  <rect width="64" height="64" rx="16" fill="#27358f"/>
+  <circle cx="34" cy="26" r="12" fill="#ffffff" fill-opacity=".10"/>
+  <path d="M28.5 22.5 H39.5" stroke="#ffffff" stroke-opacity=".62" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M28.5 28.5 H36" stroke="#f0b429" stroke-width="3.2" stroke-linecap="round"/>
+  <circle cx="34" cy="26" r="12" fill="none" stroke="#ffffff" stroke-width="5"/>
+  <path d="M22 26 V50" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+</svg>

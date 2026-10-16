@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pardarshi</title>
+<meta name="description" content="AI agents shop like you, never pay, and show the hidden fees, fake urgency and personalised prices.">
+<link rel="apple-touch-icon" href="/logo-512.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect class=%22mk-tile%22 width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%2327358f%22/%3E%3Ccircle cx=%2234%22 cy=%2226%22 r=%2212%22 fill=%22%23fff%22 fill-opacity=%22.10%22/%3E%3Cpath d=%22M28.5 22.5 H39.5%22 stroke=%22%23fff%22 stroke-opacity=%22.62%22 stroke-width=%222.4%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M28.5 28.5 H36%22 stroke=%22%23f0b429%22 stroke-width=%223.2%22 stroke-linecap=%22round%22/%3E%3Ccircle cx=%2234%22 cy=%2226%22 r=%2212%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%225%22/%3E%3Cpath d=%22M22 26 V50%22 stroke=%22%23fff%22 stroke-width=%225.5%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
+<link rel="preload" href="/fonts/Fraunces-normal-6NU78FyL.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/PublicSans-normal-ijwRs572.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<script src="/theme-init.js"></script>
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/pages.css">
+<link rel="stylesheet" href="/premium.css">
+</head>
+<body>
+<div class="lp">
+  <header class="lp-top">
+    <a class="brand" href="/" aria-label="Pardarshi">
+      <svg class="mark" width="36" height="36" viewBox="0 0 64 64" aria-hidden="true"><rect class="mk-tile" width="64" height="64" rx="16" fill="#27358f"/><circle cx="34" cy="26" r="12" fill="#fff" fill-opacity=".10"/><path d="M28.5 22.5 H39.5" stroke="#fff" stroke-opacity=".62" stroke-width="2.4" stroke-linecap="round"/><path d="M28.5 28.5 H36" stroke="#f0b429" stroke-width="3.2" stroke-linecap="round"/><circle cx="34" cy="26" r="12" fill="none" stroke="#fff" stroke-width="5"/><path d="M22 26 V50" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/></svg>
+      <span class="brand-text"><b>Pardarshi</b><span class="deva" lang="hi">पारदर्शी</span></span>
+    </a>
+    <nav class="links" aria-label="Page sections">
+      <a class="l" href="#how">How it works</a>
+      <a class="l" href="#checks">What it checks</a>
+      <button id="theme" class="icon-btn" type="button" aria-label="Switch colour theme"></button>
+      <button id="topSignin" class="btn" type="button">Sign in</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="lp-hero">
+      <div class="hero-copy">
+        <span class="pill"><i></i>Consumer-protection auditor</span>
+        <h1>See what you'd <em>really</em> be charged.</h1>
+        <p class="lede">Pardarshi sends AI agents through checkout as different shoppers, always stopping before payment. You get the hidden fees, the fake urgency and the personalised prices, with screenshots as proof.</p>
+
+        <div class="stage" id="stage" role="group" aria-label="Interactive illustration of drip pricing">
+          <canvas id="stageCanvas" aria-label="3D model: a price slab, then fee and add-on slabs land on it"></canvas>
+          <div class="stage-ui" id="stageUi">
+            <div class="st-top">
+              <div class="st-pill"><span>Advertised</span><b>&#8377;996</b></div>
+              <div class="st-pill pay"><span>You pay</span><b id="stPay">&#8377;996</b><em id="stDripWrap"><span id="stDrip">+0%</span></em></div>
+            </div>
+            <div class="st-bottom"><span class="st-hint">Drag to rotate &middot; click to pull the layers apart</span><button class="btn" id="stReplay" type="button">Replay</button></div>
+          </div>
+          <div class="stage-fallback" id="stageFallback" hidden>
+            <div class="pv-head"><div class="t"><b>TicketNest</b><small>Sample audit of a demo shop</small></div><div class="pv-score"><b>17</b><span>/ 100 transparency</span></div></div>
+            <div class="pv-row"><span>Advertised</span><div class="pv-bar"><span data-w="76.3" style="background:var(--s1);border-radius:0 4px 4px 0"></span></div><b>&#8377;996</b></div>
+          <div class="pv-row"><span>You pay</span><div class="pv-bar"><span data-w="76.3" style="background:var(--s1)"></span><span data-w="12.9" style="background:var(--s2)"></span><span data-w="10.8" style="background:var(--s3)"></span></div><b>&#8377;1,305</b></div>
+          
+          </div>
+        </div>
+        <div class="pv-tags" aria-label="What the sample audit found">
+          <span class="pv-tag" style="--c:var(--crit)"><i></i>Price grows 31% at checkout</span>
+          <span class="pv-tag" style="--c:var(--crit)"><i></i>iPhone users pay 10% more</span>
+          <span class="pv-tag" style="--c:var(--crit)"><i></i>8 clicks to cancel, 1 to join</span>
+          <span class="pv-tag" style="--c:var(--serious)"><i></i>Fake countdown timer</span>
+        </div>
+        <ul class="proofs">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m8 12.3 2.8 2.8L16 9.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Real browsers on real checkout flows, from different countries and devices</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m8 12.3 2.8 2.8L16 9.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Statistics that separate real price discrimination from ordinary noise</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m8 12.3 2.8 2.8L16 9.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>A ready-to-send complaint for India's National Consumer Helpline</span></li>
+        </ul>
+      </div>
+
+      <aside class="auth-card" id="auth" aria-label="Account">
+        <!-- sign in / create account -->
+        <div class="auth-brand"><svg class="mark" width="52" height="52" viewBox="0 0 64 64" aria-hidden="true"><rect class="mk-tile" width="64" height="64" rx="16" fill="#27358f"/><circle cx="34" cy="26" r="12" fill="#fff" fill-opacity=".10"/><path d="M28.5 22.5 H39.5" stroke="#fff" stroke-opacity=".62" stroke-width="2.4" stroke-linecap="round"/><path d="M28.5 28.5 H36" stroke="#f0b429" stroke-width="3.2" stroke-linecap="round"/><circle cx="34" cy="26" r="12" fill="none" stroke="#fff" stroke-width="5"/><path d="M22 26 V50" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/></svg><div><b>Pardarshi</b><span class="deva" lang="hi">पारदर्शी</span><small>See the real price</small></div></div>
+        <div id="viewAuth">
+          <div class="seg" role="tablist" aria-label="Account">
+            <input type="radio" name="tab" id="tab-up" value="up" checked><label for="tab-up">Create account</label>
+            <input type="radio" name="tab" id="tab-in" value="in"><label for="tab-in">Sign in</label>
+          </div>
+
+          <form id="formUp" class="form" novalidate>
+            <div><h2>Start auditing in a minute</h2><p class="sub">Free to use. Your audits stay private to you.</p></div>
+            <div id="upError" class="form-error" role="alert"></div>
+            <div class="fgroup" id="g-name"><label for="su-name">Your name</label><input class="input" id="su-name" name="name" autocomplete="name" maxlength="60" required><span class="field-err" id="e-name"></span></div>
+            <div class="fgroup" id="g-email"><label for="su-email">Email</label><input class="input" id="su-email" name="email" type="email" autocomplete="email" maxlength="120" required><span class="field-err" id="e-email"></span></div>
+            <div class="fgroup" id="g-pw"><label for="su-pw">Password</label>
+              <div class="pwwrap"><input class="input" id="su-pw" name="password" type="password" autocomplete="new-password" maxlength="200" required aria-describedby="strengthNote"><button type="button" data-toggle="su-pw" aria-label="Show password">Show</button></div>
+              <div class="strength" id="strength" data-level="0" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <div class="strength-note" id="strengthNote">At least 10 characters, with a number or symbol.</div>
+              <span class="field-err" id="e-pw"></span></div>
+            <label class="check"><input type="checkbox" id="su-terms"><span>I will only audit sites I am allowed to test. Audits are measurements, not legal findings.</span></label>
+            <button class="btn primary block" id="upBtn" type="submit">Create account</button>
+            <div class="divider">or</div>
+            <button class="btn block" id="guestBtn" type="button">Try the demo without an account</button>
+            <p class="auth-foot">Demo sessions last 24 hours. Create an account to keep your audits.</p>
+          </form>
+
+          <form id="formIn" class="form" novalidate hidden>
+            <div><h2>Welcome back</h2><p class="sub">Sign in to open your console and audit history.</p></div>
+            <div id="inError" class="form-error" role="alert"></div>
+            <div class="fgroup"><label for="si-email">Email</label><input class="input" id="si-email" name="email" type="email" autocomplete="email" required></div>
+            <div class="fgroup"><label for="si-pw">Password <button type="button" class="link" id="forgot">Forgot password?</button></label>
+              <div class="pwwrap"><input class="input" id="si-pw" name="password" type="password" autocomplete="current-password" required><button type="button" data-toggle="si-pw" aria-label="Show password">Show</button></div></div>
+            <div id="resetHelp" class="reset-help">There is no email service on this server, so reset links cannot be sent. Ask whoever runs this server to run <code>python -m scripts.manage_users reset your@email</code>, or create a new account.</div>
+            <label class="check"><input type="checkbox" id="si-remember" checked><span>Keep me signed in on this device for 30 days</span></label>
+            <button class="btn primary block" id="inBtn" type="submit">Sign in</button>
+            <div class="divider">or</div>
+            <button class="btn block" id="guestBtn2" type="button">Try the demo without an account</button>
+          </form>
+        </div>
+
+        <!-- onboarding wizard -->
+        <div id="viewWizard" hidden>
+          <div class="stepper" aria-label="Setup progress"><div class="step done" id="st1">Account</div><div class="step" id="st2">About you</div><div class="step" id="st3">Preferences</div></div>
+
+          <form id="wAbout" class="form" novalidate hidden>
+            <div><h2 id="welcomeTitle">Welcome</h2><p class="sub">Two quick questions so complaints and defaults fit you.</p></div>
+            <div class="row2">
+              <div class="fgroup"><label for="wz-country">Country</label><div class="select"><select id="wz-country" style="min-width:0;width:100%"></select></div></div>
+              <div class="fgroup"><label for="wz-city">City</label><input class="input" id="wz-city" maxlength="60" autocomplete="address-level2"></div>
+            </div>
+            <div class="fgroup"><span class="label" id="ucLabel">What do you want to check?</span><div class="opt-chips" role="group" aria-labelledby="ucLabel" id="ucChips"></div></div>
+            <div class="fgroup"><label for="wz-cname">Name on complaints</label><input class="input" id="wz-cname" maxlength="80" placeholder="Defaults to your name"><span class="help">Used to sign the complaint drafts. You can change it any time in your profile.</span></div>
+            <div id="aboutError" class="form-error" role="alert"></div>
+            <button class="btn primary block" type="submit">Continue</button>
+            <button class="btn ghost block" type="button" id="skipAbout">Skip for now</button>
+          </form>
+
+          <form id="wPrefs" class="form" novalidate hidden>
+            <div><h2>Make it yours</h2><p class="sub">Defaults for the audit console. All of this can be changed later.</p></div>
+            <div class="fgroup"><span class="label" id="pvLabel">Browser provider</span>
+              <div class="seg" role="radiogroup" aria-labelledby="pvLabel">
+                <input type="radio" name="wzprov" id="wp-os" value="opensource" checked><label for="wp-os">Open source</label>
+                <input type="radio" name="wzprov" id="wp-tf" value="tinyfish"><label for="wp-tf">TinyFish</label>
+              </div>
+              <span class="help">Open source runs locally. TinyFish runs cloud browsers from other countries.</span></div>
+            <label class="switch" for="wz-quick"><input type="checkbox" id="wz-quick"><span class="track" aria-hidden="true"></span><span>Quick runs by default <small>2 personas, uses fewer credits</small></span></label>
+            <div class="fgroup"><span class="label" id="thLabel">Appearance</span>
+              <div class="seg" role="radiogroup" aria-labelledby="thLabel">
+                <input type="radio" name="wztheme" id="wt-sys" value="system" checked><label for="wt-sys">System</label>
+                <input type="radio" name="wztheme" id="wt-li" value="light"><label for="wt-li">Light</label>
+                <input type="radio" name="wztheme" id="wt-da" value="dark"><label for="wt-da">Dark</label>
+              </div></div>
+            <div id="prefsError" class="form-error" role="alert"></div>
+            <button class="btn primary block" type="submit" id="finishBtn">Finish setup</button>
+            <button class="btn ghost block" type="button" id="backPrefs">Back</button>
+          </form>
+        </div>
+      </aside>
+    </section>
+
+    <section id="how" class="lp-section" aria-labelledby="howH">
+      <h2 id="howH">From a URL to evidence in three steps</h2>
+      <p class="sub">The agents do the tedious part: shopping the same item many times, as different people.</p>
+      <div class="cards3">
+        <article class="lp-card"><span class="n">1</span><h3>Pick a site and an intent</h3><p>Choose a site you are allowed to test. The audit follows the booking and cancellation flows a real customer would.</p></article>
+        <article class="lp-card"><span class="n">2</span><h3>Agents shop as different people</h3><p>Browsers from several countries and devices, as new and returning visitors, record every price and screen. They stop before any payment form.</p></article>
+        <article class="lp-card"><span class="n">3</span><h3>Read the evidence, send the complaint</h3><p>A transparency score, a price waterfall, screenshots for every finding and a complaint draft that cites only what was measured.</p></article>
+      </div>
+    </section>
+
+    <section id="checks" class="lp-section" aria-labelledby="chkH">
+      <h2 id="chkH">Seven things it measures</h2>
+      <p class="sub">Each check is a measurement with evidence, not an opinion.</p>
+      <div class="checks">
+        <div class="chk"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V9m6 9V5m6 13v-7m4 7H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div><h3>Drip pricing</h3><p>The advertised price against what you pay, with every fee itemised.</p></div></div>
+        <div class="chk"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16l-1.5 11h-13L4 7Zm4 0a4 4 0 0 1 8 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span><div><h3>Basket sneaking</h3><p>Paid extras that are ticked for you and added to the total.</p></div></div>
+        <div class="chk"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l2.5 2M9 3h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div><h3>Fake deadlines</h3><p>Countdown timers that jump back when the page reloads.</p></div></div>
+        <div class="chk"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><div><h3>Personalised pricing</h3><p>Different prices by country, device or visit history, beyond random noise.</p></div></div>
+        <div class="chk"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div><h3>Manipulative wording</h3><p>Scarcity, social proof, guilt-trip and nagging copy, found by a classifier.</p></div></div>
+        <div class="chk"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h12m0 0-4-4m4 4-4 4M20 5v14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h3>Cancellation friction</h3><p>Clicks to cancel against clicks to sign up.</p></div></div>
+        <div class="chk"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7V3Zm8 0v4h4M10 12h6M10 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span><div><h3>Policy against reality</h3><p>Each written promise in the terms, checked against what the audit saw.</p></div></div>
+      </div>
+    </section>
+
+    <section class="lp-section" aria-label="Safety">
+      <div class="safety-strip">
+        <div><b>It never pays</b><span>Agents stop at the payment screen. Nothing is typed into card fields.</span></div>
+        <div><b>It uses no personal data</b><span>No logins and no real details. Read-only browsing at low volume.</span></div>
+        <div><b>It only audits allowed sites</b><span>Hosts must be on the server's allowlist before any run starts.</span></div>
+        <div><b>Your audits are private</b><span>Reports and screenshots are visible only to your account.</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="lp-foot"><span class="foot-brand"><svg class="mark" width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><rect class="mk-tile" width="64" height="64" rx="16" fill="#27358f"/><circle cx="34" cy="26" r="12" fill="#fff" fill-opacity=".10"/><path d="M28.5 22.5 H39.5" stroke="#fff" stroke-opacity=".62" stroke-width="2.4" stroke-linecap="round"/><path d="M28.5 28.5 H36" stroke="#f0b429" stroke-width="3.2" stroke-linecap="round"/><circle cx="34" cy="26" r="12" fill="none" stroke="#fff" stroke-width="5"/><path d="M22 26 V50" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/></svg><b>Pardarshi</b><span class="deva" lang="hi">पारदर्शी</span></span><span>Pardarshi audits are measurements with evidence, not legal findings.</span><span>Category names follow India's 2023 dark-pattern guidelines and are indicative.</span></footer>
+</div>
+<script src="/vendor/three.min.js"></script>
+<script src="/common.js"></script>
+<script src="/scene3d.js"></script>
+<script src="/landing.js"></script>
+</body>
+</html>

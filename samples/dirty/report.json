@@ -1,0 +1,545 @@
+{
+ "audit_id": "dirty-ece7a9",
+ "site": "TicketNest (demo)",
+ "provider": "opensource",
+ "created_at": "2026-10-15T06:27:20.144548Z",
+ "runs_total": 8,
+ "runs_ok": 8,
+ "trust_score": 16.7,
+ "findings": [
+  {
+   "id": "drip_pricing",
+   "type": "drip_pricing",
+   "title": "Drip pricing: the price grows 31% between the first screen and payment",
+   "detail": "Advertised 1094 INR; payable 1424 INR. Added during checkout: Convenience fee 88, Service fee 44, Processing fee 49, Ticket Protect insurance 149. Median over 6 runs.",
+   "ccpa": "Drip pricing",
+   "severity": "high",
+   "penalty": 25.0,
+   "evidence": [
+    {
+     "run_id": "a5922a9888",
+     "step_name": "event",
+     "text": "Advertised 1094",
+     "screenshot": "shots/70cce12864_0_event.jpg"
+    },
+    {
+     "run_id": "a5922a9888",
+     "step_name": "payment",
+     "text": "Payable 1424",
+     "screenshot": "shots/7495b9e9fe_2_payment.jpg"
+    }
+   ],
+   "metrics": {
+    "median_drip_pct": 30.9,
+    "runs": 6
+   }
+  },
+  {
+   "id": "personalization",
+   "type": "personalization",
+   "title": "Prices differ by persona beyond random price noise",
+   "detail": "device = iphone (vs desktop): +10.7% [95% CI +8.3, +13.2], p_adj=0.0002. Site noise (1 sd) is about 0.96%, so these gaps are not chance.",
+   "ccpa": "Unfair trade practice (personalised pricing)",
+   "severity": "high",
+   "penalty": 20.365000000000002,
+   "evidence": [],
+   "metrics": {
+    "effects": [
+     {
+      "factor": "device",
+      "level": "iphone",
+      "vs": "desktop",
+      "effect_pct": 10.73,
+      "ci_low_pct": 8.35,
+      "ci_high_pct": 13.16,
+      "p": 0.0002,
+      "p_adj": 0.0002,
+      "significant": true
+     }
+    ],
+    "noise_pct": 0.96
+   }
+  },
+  {
+   "id": "friction",
+   "type": "friction",
+   "title": "Cancelling takes 8 clicks; signing up took 1",
+   "detail": "8x more effort to leave than to join, across 8 screens, 3 of them retention or guilt-trip interruptions.",
+   "ccpa": "Subscription trap",
+   "severity": "high",
+   "penalty": 15.0,
+   "evidence": [
+    {
+     "run_id": "8927425bf4",
+     "step_name": "settings",
+     "text": "",
+     "screenshot": "shots/972851ed19_1_settings.jpg"
+    },
+    {
+     "run_id": "8927425bf4",
+     "step_name": "membership",
+     "text": "",
+     "screenshot": "shots/535227ee26_2_membership.jpg"
+    },
+    {
+     "run_id": "8927425bf4",
+     "step_name": "manage_billing",
+     "text": "",
+     "screenshot": "shots/75a6263f82_3_manage_billing.jpg"
+    }
+   ],
+   "metrics": {
+    "cancel_clicks": 8.0,
+    "signup_clicks": 1.0,
+    "ratio": 8.0,
+    "screens": 8,
+    "interruption_screens": 3
+   }
+  },
+  {
+   "id": "basket_sneaking",
+   "type": "basket_sneaking",
+   "title": "Basket sneaking: 'Ticket Protect insurance' (149) is added to the order by default",
+   "detail": "A pre-ticked checkbox adds a paid extra to the total in 6 of 6 runs. The shopper never asked for it.",
+   "ccpa": "Basket sneaking",
+   "severity": "high",
+   "penalty": 10.0,
+   "evidence": [
+    {
+     "run_id": "18fa6e27d3",
+     "step_name": "cart",
+     "text": "Ticket Protect insurance",
+     "screenshot": "shots/2d1a1436cd_1_cart.jpg"
+    }
+   ],
+   "metrics": {
+    "amount": 149.0,
+    "runs": 6
+   }
+  },
+  {
+   "id": "pattern:false_urgency",
+   "type": "pattern:false_urgency",
+   "title": "False urgency (countdown / deadline pressure)",
+   "detail": "A countdown ran down (09:58) and then jumped back to 09:59 after a page reload: the deadline is not real.",
+   "ccpa": "False urgency",
+   "severity": "high",
+   "penalty": 10.0,
+   "evidence": [
+    {
+     "run_id": "18fa6e27d3",
+     "step_name": "event",
+     "text": "Timer 09:58 -> 09:59 on reload",
+     "screenshot": "shots/95c2aac817_0_event.jpg"
+    }
+   ],
+   "metrics": {
+    "reset_observations": 6
+   }
+  },
+  {
+   "id": "policy:0",
+   "type": "policy",
+   "title": "Policy contradicts behaviour: “All fees are shown upfront before you choose your tickets.”",
+   "detail": "The policy promises fees are shown upfront before choosing tickets, but the audit reveals fees are only shown at checkout and the payable price is 32% higher than advertised. Observed: Advertised price 989, payable price 1306 (+32%). Fees only shown at checkout.",
+   "ccpa": "Misleading policy / unfair trade practice",
+   "severity": "high",
+   "penalty": 8.0,
+   "evidence": [
+    {
+     "run_id": "",
+     "step_name": "policy page",
+     "text": "All fees are shown upfront before you choose your tickets.",
+     "screenshot": null
+    }
+   ],
+   "metrics": {
+    "policy_url": "http://127.0.0.1:8100/dirty/terms"
+   }
+  },
+  {
+   "id": "policy:1",
+   "type": "policy",
+   "title": "Policy contradicts behaviour: “You can cancel your membership anytime, online, in a couple of clicks.”",
+   "detail": "The policy claims cancellation takes 'a couple of clicks', whereas the measured fact shows it required 8 clicks and 3 interruption screens. Observed: Cancelling took 8 clicks vs 1 to sign up (3 interruption screens).",
+   "ccpa": "Misleading policy / unfair trade practice",
+   "severity": "high",
+   "penalty": 8.0,
+   "evidence": [
+    {
+     "run_id": "",
+     "step_name": "policy page",
+     "text": "You can cancel your membership anytime, online, in a couple of clicks.",
+     "screenshot": null
+    }
+   ],
+   "metrics": {
+    "policy_url": "http://127.0.0.1:8100/dirty/terms"
+   }
+  },
+  {
+   "id": "policy:2",
+   "type": "policy",
+   "title": "Policy contradicts behaviour: “We charge the same price to every customer.”",
+   "detail": "The policy promises the same price to every customer, but measured facts show prices differ based on the user's device persona (iphone users are charged 11% more). Observed: Prices differ by persona: device=iphone +11%",
+   "ccpa": "Misleading policy / unfair trade practice",
+   "severity": "high",
+   "penalty": 8.0,
+   "evidence": [
+    {
+     "run_id": "",
+     "step_name": "policy page",
+     "text": "We charge the same price to every customer.",
+     "screenshot": null
+    }
+   ],
+   "metrics": {
+    "policy_url": "http://127.0.0.1:8100/dirty/terms"
+   }
+  },
+  {
+   "id": "pattern:scarcity",
+   "type": "pattern:scarcity",
+   "title": "Scarcity pressure ('only N left')",
+   "detail": "Seen: “Only 2 tickets left at this price!”",
+   "ccpa": "False urgency",
+   "severity": "medium",
+   "penalty": 6.0,
+   "evidence": [
+    {
+     "run_id": "18fa6e27d3",
+     "step_name": "event",
+     "text": "Only 2 tickets left at this price!",
+     "screenshot": "shots/95c2aac817_0_event.jpg"
+    }
+   ],
+   "metrics": {
+    "distinct_texts": 1,
+    "avg_confidence": 0.963
+   }
+  },
+  {
+   "id": "pattern:confirmshaming",
+   "type": "pattern:confirmshaming",
+   "title": "Confirm-shaming (guilt-trip wording)",
+   "detail": "Seen: “No thanks, I'd rather risk losing my tickets”; “Yes, I don't care about saving money”",
+   "ccpa": "Confirm shaming",
+   "severity": "medium",
+   "penalty": 6.0,
+   "evidence": [
+    {
+     "run_id": "18fa6e27d3",
+     "step_name": "cart",
+     "text": "No thanks, I'd rather risk losing my tickets",
+     "screenshot": "shots/2d1a1436cd_1_cart.jpg"
+    },
+    {
+     "run_id": "8927425bf4",
+     "step_name": "confirm",
+     "text": "Yes, I don't care about saving money",
+     "screenshot": "shots/fb7bfb6b21_6_confirm.jpg"
+    }
+   ],
+   "metrics": {
+    "distinct_texts": 2,
+    "avg_confidence": 0.808
+   }
+  },
+  {
+   "id": "pattern:fake_social_proof",
+   "type": "pattern:fake_social_proof",
+   "title": "Unverified social proof ('N people viewing')",
+   "detail": "Seen: “37 people are viewing this event right now”; “128 tickets sold in the last hour”",
+   "ccpa": "False urgency",
+   "severity": "medium",
+   "penalty": 5.0,
+   "evidence": [
+    {
+     "run_id": "18fa6e27d3",
+     "step_name": "event",
+     "text": "37 people are viewing this event right now",
+     "screenshot": "shots/95c2aac817_0_event.jpg"
+    },
+    {
+     "run_id": "18fa6e27d3",
+     "step_name": "event",
+     "text": "128 tickets sold in the last hour",
+     "screenshot": "shots/95c2aac817_0_event.jpg"
+    }
+   ],
+   "metrics": {
+    "distinct_texts": 2,
+    "avg_confidence": 0.835
+   }
+  },
+  {
+   "id": "pattern:nagging",
+   "type": "pattern:nagging",
+   "title": "Nagging / retention interruptions",
+   "detail": "Seen: “Why are you leaving?”; “Wait! Don't miss out.”; “Are you sure?”",
+   "ccpa": "Nagging",
+   "severity": "medium",
+   "penalty": 4.0,
+   "evidence": [
+    {
+     "run_id": "8927425bf4",
+     "step_name": "no_thanks,_continue",
+     "text": "Why are you leaving?",
+     "screenshot": "shots/ce5b2ceace_5_no_thanks,_continue.jpg"
+    },
+    {
+     "run_id": "8927425bf4",
+     "step_name": "end_membership",
+     "text": "Wait! Don't miss out.",
+     "screenshot": "shots/d8c35d4c8a_4_end_membership.jpg"
+    },
+    {
+     "run_id": "8927425bf4",
+     "step_name": "confirm",
+     "text": "Are you sure?",
+     "screenshot": "shots/fb7bfb6b21_6_confirm.jpg"
+    }
+   ],
+   "metrics": {
+    "distinct_texts": 3,
+    "avg_confidence": 0.813
+   }
+  }
+ ],
+ "waterfalls": [
+  {
+   "persona_id": "base",
+   "persona": "US/desktop/new",
+   "n": 3,
+   "currency": "INR",
+   "advertised": 989.0,
+   "final": 1306.0,
+   "drip_pct": 32.1,
+   "items": [
+    {
+     "label": "Ticket x 1",
+     "amount": 989.0,
+     "kind": "base",
+     "preselected": false
+    },
+    {
+     "label": "Convenience fee",
+     "amount": 79.0,
+     "kind": "fee",
+     "preselected": false
+    },
+    {
+     "label": "Service fee",
+     "amount": 40.0,
+     "kind": "fee",
+     "preselected": false
+    },
+    {
+     "label": "Processing fee",
+     "amount": 49.0,
+     "kind": "fee",
+     "preselected": false
+    },
+    {
+     "label": "Ticket Protect insurance",
+     "amount": 149.0,
+     "kind": "addon",
+     "preselected": false
+    }
+   ],
+   "screenshot": "shots/402b99ac03_2_payment.jpg",
+   "run": {
+    "run_id": "fe30f0236e",
+    "advertised": 989.0,
+    "final": 1306.0,
+    "first_screenshot": "shots/0d0647954b_0_event.jpg",
+    "stopped_at": "payment"
+   }
+  },
+  {
+   "persona_id": "iphone",
+   "persona": "US/iphone/new",
+   "n": 3,
+   "currency": "INR",
+   "advertised": 1101.0,
+   "final": 1431.0,
+   "drip_pct": 30.0,
+   "items": [
+    {
+     "label": "Ticket x 1",
+     "amount": 1101.0,
+     "kind": "base",
+     "preselected": false
+    },
+    {
+     "label": "Convenience fee",
+     "amount": 88.0,
+     "kind": "fee",
+     "preselected": false
+    },
+    {
+     "label": "Service fee",
+     "amount": 44.0,
+     "kind": "fee",
+     "preselected": false
+    },
+    {
+     "label": "Processing fee",
+     "amount": 49.0,
+     "kind": "fee",
+     "preselected": false
+    },
+    {
+     "label": "Ticket Protect insurance",
+     "amount": 149.0,
+     "kind": "addon",
+     "preselected": false
+    }
+   ],
+   "screenshot": "shots/a9dbad4a5a_2_payment.jpg",
+   "run": {
+    "run_id": "b194239e55",
+    "advertised": 1101.0,
+    "final": 1431.0,
+    "first_screenshot": "shots/fe0054ab94_0_event.jpg",
+    "stopped_at": "payment"
+   }
+  }
+ ],
+ "personalization": {
+  "advertised": {
+   "price_field": "advertised_price",
+   "n_runs": 6,
+   "baseline": {
+    "country": "US",
+    "device": "desktop",
+    "user_state": "new"
+   },
+   "effects": [
+    {
+     "factor": "device",
+     "level": "iphone",
+     "vs": "desktop",
+     "effect_pct": 10.73,
+     "ci_low_pct": 8.35,
+     "ci_high_pct": 13.16,
+     "p": 0.0002,
+     "p_adj": 0.0002,
+     "significant": true
+    }
+   ],
+   "any_significant": true,
+   "noise_pct": 0.96,
+   "note": "Residual noise (1 sd) is 0.96%. Effects are flagged only if p_adj < 0.05 and |effect| >= 2%.",
+   "df": 4
+  },
+  "final": {
+   "price_field": "final_price",
+   "n_runs": 6,
+   "baseline": {
+    "country": "US",
+    "device": "desktop",
+    "user_state": "new"
+   },
+   "effects": [
+    {
+     "factor": "device",
+     "level": "iphone",
+     "vs": "desktop",
+     "effect_pct": 9.13,
+     "ci_low_pct": 7.14,
+     "ci_high_pct": 11.15,
+     "p": 0.00019,
+     "p_adj": 0.00019,
+     "significant": true
+    }
+   ],
+   "any_significant": true,
+   "noise_pct": 0.81,
+   "note": "Residual noise (1 sd) is 0.81%. Effects are flagged only if p_adj < 0.05 and |effect| >= 2%.",
+   "df": 4
+  }
+ },
+ "friction": {
+  "cancel_clicks": 8.0,
+  "signup_clicks": 1.0,
+  "ratio": 8.0,
+  "screens": 8,
+  "interruption_screens": 3
+ },
+ "score_breakdown": [
+  {
+   "finding": "drip_pricing",
+   "title": "Drip pricing: the price grows 31% between the first screen and payment",
+   "penalty": 25.0
+  },
+  {
+   "finding": "personalization",
+   "title": "Prices differ by persona beyond random price noise",
+   "penalty": 20.4
+  },
+  {
+   "finding": "friction",
+   "title": "Cancelling takes 8 clicks; signing up took 1",
+   "penalty": 15.0
+  },
+  {
+   "finding": "basket_sneaking",
+   "title": "Basket sneaking: 'Ticket Protect insurance' (149) is added to the order by default",
+   "penalty": 10.0
+  },
+  {
+   "finding": "pattern:false_urgency",
+   "title": "False urgency (countdown / deadline pressure)",
+   "penalty": 10.0
+  },
+  {
+   "finding": "policy:0",
+   "title": "Policy contradicts behaviour: “All fees are shown upfront before you choose your tickets.”",
+   "penalty": 8.0
+  },
+  {
+   "finding": "policy:1",
+   "title": "Policy contradicts behaviour: “You can cancel your membership anytime, online, in a couple of clicks.”",
+   "penalty": 8.0
+  },
+  {
+   "finding": "policy:2",
+   "title": "Policy contradicts behaviour: “We charge the same price to every customer.”",
+   "penalty": 8.0
+  },
+  {
+   "finding": "pattern:scarcity",
+   "title": "Scarcity pressure ('only N left')",
+   "penalty": 6.0
+  },
+  {
+   "finding": "pattern:confirmshaming",
+   "title": "Confirm-shaming (guilt-trip wording)",
+   "penalty": 6.0
+  },
+  {
+   "finding": "pattern:fake_social_proof",
+   "title": "Unverified social proof ('N people viewing')",
+   "penalty": 5.0
+  },
+  {
+   "finding": "pattern:nagging",
+   "title": "Nagging / retention interruptions",
+   "penalty": 4.0
+  }
+ ],
+ "notes": [],
+ "products": [
+  {
+   "name": "Indie Rock Night",
+   "url": "http://127.0.0.1:8100/dirty/event/1",
+   "runs": 6,
+   "personas": [
+    "US/desktop/new",
+    "US/iphone/new"
+   ],
+   "used": true
+  }
+ ]
+}

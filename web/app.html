@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pardarshi</title>
+<meta name="description" content="Agents that shop like you, and show what they were charged.">
+<link rel="apple-touch-icon" href="/logo-512.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect class=%22mk-tile%22 width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%2327358f%22/%3E%3Ccircle cx=%2234%22 cy=%2226%22 r=%2212%22 fill=%22%23fff%22 fill-opacity=%22.10%22/%3E%3Cpath d=%22M28.5 22.5 H39.5%22 stroke=%22%23fff%22 stroke-opacity=%22.62%22 stroke-width=%222.4%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M28.5 28.5 H36%22 stroke=%22%23f0b429%22 stroke-width=%223.2%22 stroke-linecap=%22round%22/%3E%3Ccircle cx=%2234%22 cy=%2226%22 r=%2212%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%225%22/%3E%3Cpath d=%22M22 26 V50%22 stroke=%22%23fff%22 stroke-width=%225.5%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
+<link rel="preload" href="/fonts/Fraunces-normal-6NU78FyL.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/PublicSans-normal-ijwRs572.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<script src="/theme-init.js"></script>
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/pages.css">
+<link rel="stylesheet" href="/premium.css">
+</head>
+<body>
+<div class="shell">
+
+  <header class="appbar" id="appbar"></header>
+
+  <section class="toolbar" aria-label="Audit controls">
+    <div class="field">
+      <label for="site">Site</label>
+      <div class="select"><select id="site"></select></div>
+    </div>
+    <div class="field">
+      <span class="label" id="provLabel">Browser provider</span>
+      <div class="seg" role="radiogroup" aria-labelledby="provLabel">
+        <input type="radio" name="provider" id="p-default" value="" checked><label for="p-default">Server default</label>
+        <input type="radio" name="provider" id="p-os" value="opensource"><label for="p-os">Open source</label>
+        <input type="radio" name="provider" id="p-tf" value="tinyfish"><label for="p-tf">TinyFish</label>
+      </div>
+    </div>
+    <label class="switch" for="quick"><input type="checkbox" id="quick"><span class="track" aria-hidden="true"></span><span>Quick run <small>2 personas</small></span></label>
+    <button id="run" class="btn primary" type="button">Run audit</button>
+  </section>
+  <p class="safety"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.2 8 8 9 4.8-1 8-4.5 8-9V6l-8-3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Agents browse as different shoppers, record every price and screen, and always stop before payment. Nothing is ever bought.</p>
+
+  <section id="progress" class="card progress" hidden aria-live="polite">
+    <div class="progress-head"><b id="progressTitle">Starting agents</b><span id="progressCount" class="mono"></span></div>
+    <div class="meter"><i id="barfill"></i></div>
+    <p id="pinned" class="pinned" hidden></p>
+    <div id="agents" class="agents" aria-label="Agents at work"></div>
+    <div id="inconclusive" class="inconclusive" hidden></div>
+  </section>
+
+  <main id="report" hidden>
+
+
+    <div class="report-grid">
+      <div class="rg-main">
+        <section class="card hero" aria-labelledby="siteName">
+          <div class="hero-main">
+            <p class="eyebrow" id="eyebrow"></p>
+            <h1 id="siteName"></h1>
+            <p id="verdict" class="verdict"></p>
+            <p id="productLine" class="product-line" hidden></p>
+            <div class="hero-actions">
+              <a id="reportLink" class="btn primary" href="/report">Findings report</a>
+              <button id="complaintBtn" class="btn" type="button">Draft a complaint</button>
+              <span id="runsNote" class="muted small"></span>
+            </div>
+          </div>
+          <div class="hero-score">
+            <span class="eyebrow">Transparency score</span>
+            <div class="ring-wrap">
+              <canvas id="ringCanvas" aria-hidden="true"></canvas>
+              <div class="ring-center"><span id="scoreNum" class="score-num">0</span><span class="score-of">out of 100</span></div>
+            </div>
+            <span id="scoreWord" class="status-pill"></span>
+          </div>
+        </section>
+
+        <section id="kpis" class="kpis" aria-label="Key measurements"></section>
+
+        <section id="evidence" class="card evidence" hidden aria-labelledby="evH">
+          <header class="card-head"><div><h2 id="evH">What the shopper saw</h2><p class="muted small" id="evSub"></p></div><span class="ev-stamp mono" id="evStamp"></span></header>
+          <div class="ev-strip" id="evStrip"></div>
+        </section>
+    <section class="grid2">
+      <article class="card chart-card">
+        <header class="card-head">
+          <div><h2>Price waterfall</h2><p class="muted small">Advertised price against what each shopper would actually pay.</p></div>
+          <div class="seg seg-sm" role="radiogroup" aria-label="Waterfall view">
+            <input type="radio" name="wfview" id="wf-chart" value="chart" checked><label for="wf-chart">Chart</label>
+            <input type="radio" name="wfview" id="wf-table" value="table"><label for="wf-table">Table</label>
+          </div>
+        </header>
+        <div id="wfLegend" class="legend"></div>
+        <div id="wfBody" class="chartbody"></div>
+      </article>
+      <article class="card chart-card">
+        <header class="card-head">
+          <div><h2>Does the price depend on who you are?</h2><p class="muted small" id="effSub">Price difference against the baseline shopper, with 95% confidence interval.</p></div>
+          <div class="seg seg-sm" role="radiogroup" aria-label="Effects view">
+            <input type="radio" name="effview" id="ef-chart" value="chart" checked><label for="ef-chart">Chart</label>
+            <input type="radio" name="effview" id="ef-table" value="table"><label for="ef-table">Table</label>
+          </div>
+        </header>
+        <div id="effLegend" class="legend"></div>
+        <div id="effBody" class="chartbody"></div>
+        <p id="effNote" class="muted small note"></p>
+      </article>
+    </section>
+
+    <section class="grid-wide">
+      <article class="card">
+        <header class="card-head">
+          <div><h2>Findings</h2><p class="muted small" id="findSub"></p></div>
+          <div class="seg seg-sm" role="radiogroup" aria-label="Filter findings by severity" id="sevFilter"></div>
+        </header>
+        <div id="findings"></div>
+      </article>
+      <article class="card">
+        <header class="card-head"><div><h2>Where the points went</h2><p class="muted small">Penalty per finding. The score is 100&times;e<sup>&minus;total/70</sup>.</p></div></header>
+        <div id="breakdown" class="breakdown"></div>
+      </article>
+    </section>
+      </div>
+
+      <aside class="assistant" id="assistant" aria-label="Audit assistant">
+        <header class="as-head">
+          <div class="as-title"><span class="as-orb" aria-hidden="true"></span><div><h2>Audit assistant</h2><p class="muted small" id="asCtx">Knows this whole audit</p></div></div>
+          <div class="as-tools">
+            <button id="asSpeak" class="icon-btn" type="button" aria-pressed="false" aria-label="Read answers aloud" title="Read answers aloud"></button>
+            <button id="asClear" class="icon-btn" type="button" aria-label="Clear conversation" title="Clear conversation"></button>
+          </div>
+        </header>
+        <div class="seg seg-sm" role="radiogroup" aria-label="Assistant mode">
+          <input type="radio" name="asmode" id="as-audit" value="audit" checked><label for="as-audit">About this audit</label>
+          <input type="radio" name="asmode" id="as-agent" value="agent"><label for="as-agent">Agent: run new audits</label>
+        </div>
+        <div id="asLog" class="as-log" role="log" aria-live="polite" aria-label="Conversation"></div>
+        <div id="asSuggest" class="suggest"></div>
+        <div id="asWave" class="as-wave" aria-live="assertive"><i></i><i></i><i></i><i></i><i></i><span id="asHeard">Listening&hellip;</span></div>
+        <form id="asForm" class="as-form">
+          <button id="asMic" class="mic" type="button" aria-pressed="false" aria-label="Ask by voice" title="Ask by voice"></button>
+          <label class="sr" for="asInput">Your question</label>
+          <input id="asInput" type="text" placeholder="Ask anything about this audit" autocomplete="off" maxlength="600">
+          <button class="btn primary" type="submit">Send</button>
+        </form>
+        <p id="asNote" class="as-note"></p>
+      </aside>
+    </div>
+  </main>
+
+  <section class="grid2 lower">
+    <div class="stack" style="display:contents">
+      <article class="card">
+        <header class="card-head"><div><h2>Leaderboard</h2><p class="muted small">Latest audit per site and provider.</p></div></header>
+        <div id="board"></div>
+      </article>
+      <article class="card">
+        <header class="card-head"><div><h2>How good is the detector?</h2><p class="muted small">Measured on held-out data, not claimed.</p></div></header>
+        <div id="quality"></div>
+      </article>
+    </div>
+  </section>
+
+  <footer class="foot muted small"><span class="foot-brand"><svg class="mark" width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><rect class="mk-tile" width="64" height="64" rx="16" fill="#27358f"/><circle cx="34" cy="26" r="12" fill="#fff" fill-opacity=".10"/><path d="M28.5 22.5 H39.5" stroke="#fff" stroke-opacity=".62" stroke-width="2.4" stroke-linecap="round"/><path d="M28.5 28.5 H36" stroke="#f0b429" stroke-width="3.2" stroke-linecap="round"/><circle cx="34" cy="26" r="12" fill="none" stroke="#fff" stroke-width="5"/><path d="M22 26 V50" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/></svg><b>Pardarshi</b></span> Pardarshi audits are measurements with evidence, not legal findings. Category names follow India's 2023 dark-pattern guidelines and are indicative.</footer>
+</div>
+
+<div id="tip" role="tooltip" hidden></div>
+<dialog id="modal"><form method="dialog"><button class="icon-btn x" aria-label="Close">&times;</button></form><div id="modalBody"></div></dialog>
+<script src="/vendor/three.min.js"></script>
+<script src="/common.js"></script>
+<script src="/scene3d.js"></script>
+<script src="/assistant.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

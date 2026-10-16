@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pardarshi profile</title>
+<meta name="description" content="Your account, preferences, security and audit history.">
+<link rel="apple-touch-icon" href="/logo-512.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect class=%22mk-tile%22 width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%2327358f%22/%3E%3Ccircle cx=%2234%22 cy=%2226%22 r=%2212%22 fill=%22%23fff%22 fill-opacity=%22.10%22/%3E%3Cpath d=%22M28.5 22.5 H39.5%22 stroke=%22%23fff%22 stroke-opacity=%22.62%22 stroke-width=%222.4%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M28.5 28.5 H36%22 stroke=%22%23f0b429%22 stroke-width=%223.2%22 stroke-linecap=%22round%22/%3E%3Ccircle cx=%2234%22 cy=%2226%22 r=%2212%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%225%22/%3E%3Cpath d=%22M22 26 V50%22 stroke=%22%23fff%22 stroke-width=%225.5%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
+<link rel="preload" href="/fonts/Fraunces-normal-6NU78FyL.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/PublicSans-normal-ijwRs572.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<script src="/theme-init.js"></script>
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/pages.css">
+<link rel="stylesheet" href="/premium.css">
+</head>
+<body>
+<div class="shell">
+  <header class="appbar" id="appbar"></header>
+
+  <section class="card pf-hero" aria-label="Your profile">
+    <div id="heroAvatar"></div>
+    <div style="min-width:0;flex:1">
+      <h1 id="heroName"></h1>
+      <div class="meta" id="heroMeta"></div>
+    </div>
+  </section>
+
+  <div id="guestBanner" class="pf-banner" hidden>
+    <span><b>You are in a demo session.</b> It ends after 24 hours and its audits are deleted. Create an account and your audits move with you.</span>
+    <a class="btn primary" href="/?upgrade=1">Create an account</a>
+  </div>
+
+  <section id="stats" class="kpis" aria-label="Your activity"></section>
+
+  <div class="pf-grid">
+    <nav class="pf-nav" id="pfNav" aria-label="Profile sections">
+      <a href="#account" class="on">Account</a>
+      <a href="#complaints">Complaint details</a>
+      <a href="#preferences">Preferences</a>
+      <a href="#security">Security</a>
+      <a href="#history">Audit history</a>
+      <a href="#danger">Delete account</a>
+    </nav>
+
+    <div class="pf-main">
+      <section class="card pf-sec" id="account" aria-labelledby="h-account">
+        <h2 id="h-account">Account</h2>
+        <p class="desc">Your name appears in the app and on complaint drafts.</p>
+        <form id="formAccount" class="form" novalidate>
+          <div class="row2">
+            <div class="fgroup"><label for="pf-name">Name</label><input class="input" id="pf-name" maxlength="60" autocomplete="name" required></div>
+            <div class="fgroup"><label for="pf-email">Email</label><input class="input" id="pf-email" readonly><span class="help" id="emailHelp">Your email is your sign-in and cannot be changed here.</span></div>
+          </div>
+          <div class="row2">
+            <div class="fgroup"><label for="pf-country">Country</label><div class="select"><select id="pf-country" style="min-width:0;width:100%"></select></div></div>
+            <div class="fgroup"><label for="pf-city">City</label><input class="input" id="pf-city" maxlength="60" autocomplete="address-level2"></div>
+          </div>
+          <div id="accErr" class="form-error" role="alert"></div>
+          <div class="pf-actions"><button class="btn primary" type="submit">Save changes</button><span class="form-ok" id="accOk" role="status"></span></div>
+        </form>
+      </section>
+
+      <section class="card pf-sec" id="complaints" aria-labelledby="h-complaints">
+        <h2 id="h-complaints">Complaint details</h2>
+        <p class="desc">Used to sign the complaint drafts for India's National Consumer Helpline. Drafts only ever cite what an audit measured.</p>
+        <form id="formComplaint" class="form" novalidate>
+          <div class="fgroup"><label for="pf-cname">Name on complaints</label><input class="input" id="pf-cname" maxlength="80" placeholder="Defaults to your name"></div>
+          <div class="fgroup"><span class="label" id="pf-ucl">What you usually check</span><div class="opt-chips" role="group" aria-labelledby="pf-ucl" id="pf-uc"></div></div>
+          <div id="cmpErr" class="form-error" role="alert"></div>
+          <div class="pf-actions"><button class="btn primary" type="submit">Save</button><span class="form-ok" id="cmpOk" role="status"></span></div>
+        </form>
+      </section>
+
+      <section class="card pf-sec" id="preferences" aria-labelledby="h-prefs">
+        <h2 id="h-prefs">Preferences</h2>
+        <p class="desc">Defaults for the audit console.</p>
+        <form id="formPrefs" class="form" novalidate>
+          <div class="fgroup"><span class="label" id="pf-pl">Browser provider</span>
+            <div class="seg" role="radiogroup" aria-labelledby="pf-pl">
+              <input type="radio" name="pfprov" id="pp-d" value=""><label for="pp-d">Server default</label>
+              <input type="radio" name="pfprov" id="pp-o" value="opensource"><label for="pp-o">Open source</label>
+              <input type="radio" name="pfprov" id="pp-t" value="tinyfish"><label for="pp-t">TinyFish</label>
+            </div></div>
+          <label class="switch" for="pf-quick"><input type="checkbox" id="pf-quick"><span class="track" aria-hidden="true"></span><span>Quick runs by default <small>2 personas, uses fewer credits</small></span></label>
+          <div class="fgroup"><span class="label" id="pf-tl">Appearance</span>
+            <div class="seg" role="radiogroup" aria-labelledby="pf-tl">
+              <input type="radio" name="pftheme" id="pt-s" value="system"><label for="pt-s">System</label>
+              <input type="radio" name="pftheme" id="pt-l" value="light"><label for="pt-l">Light</label>
+              <input type="radio" name="pftheme" id="pt-d" value="dark"><label for="pt-d">Dark</label>
+            </div></div>
+          <div id="prefErr" class="form-error" role="alert"></div>
+          <div class="pf-actions"><button class="btn primary" type="submit">Save preferences</button><span class="form-ok" id="prefOk" role="status"></span></div>
+        </form>
+      </section>
+
+      <section class="card pf-sec" id="security" aria-labelledby="h-sec">
+        <h2 id="h-sec">Security</h2>
+        <p class="desc">Change your password and manage the devices signed in to your account.</p>
+        <form id="formPw" class="form" novalidate>
+          <div class="row2">
+            <div class="fgroup"><label for="pw-cur">Current password</label><input class="input" id="pw-cur" type="password" autocomplete="current-password" maxlength="200"></div>
+            <div class="fgroup" id="g-pw"><label for="pw-new">New password</label>
+              <div class="pwwrap"><input class="input" id="pw-new" type="password" autocomplete="new-password" maxlength="200"><button type="button" id="pwShow" aria-label="Show password">Show</button></div>
+              <div class="strength" id="strength" data-level="0" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <div class="strength-note" id="strengthNote">At least 10 characters, with a number or symbol.</div></div>
+          </div>
+          <div id="pwErr" class="form-error" role="alert"></div>
+          <div class="pf-actions"><button class="btn primary" type="submit" id="pwBtn">Update password</button><span class="form-ok" id="pwOk" role="status"></span></div>
+        </form>
+        <p id="pwGuest" class="muted small" hidden>Demo sessions have no password. Create an account to set one.</p>
+        <h3 style="font-size:14.5px;margin:26px 0 4px;font-weight:620">Signed-in devices</h3>
+        <div id="sessions"></div>
+        <div class="pf-actions"><button class="btn" type="button" id="revokeOthers">Sign out other devices</button><button class="btn ghost" type="button" id="signoutHere">Sign out of this device</button></div>
+      </section>
+
+      <section class="card pf-sec" id="history" aria-labelledby="h-hist">
+        <h2 id="h-hist">Audit history</h2>
+        <p class="desc">Only you can see these reports and their screenshots.</p>
+        <div id="histBody"></div>
+      </section>
+
+      <section class="card pf-sec danger-zone" id="danger" aria-labelledby="h-danger">
+        <h2 id="h-danger">Delete account</h2>
+        <p class="desc">Permanently removes your account, your audits and their screenshots. This cannot be undone.</p>
+        <button class="btn" type="button" id="delOpen">I want to delete my account</button>
+        <form id="formDel" class="form" hidden novalidate style="margin-top:16px">
+          <div class="fgroup" id="delPwGroup"><label for="del-pw">Confirm with your password</label><input class="input" id="del-pw" type="password" autocomplete="current-password" maxlength="200"></div>
+          <div id="delErr" class="form-error" role="alert"></div>
+          <div class="pf-actions" style="margin-top:0"><button class="btn danger" type="submit" id="delBtn">Delete account and audits</button><button class="btn ghost" type="button" id="delCancel">Keep my account</button></div>
+        </form>
+      </section>
+    </div>
+  </div>
+</div>
+<div id="tip" role="tooltip" hidden></div>
+<dialog id="modal"><form method="dialog"><button class="icon-btn x" aria-label="Close">&times;</button></form><div id="modalBody"></div></dialog>
+<script src="/common.js"></script>
+<script src="/profile.js"></script>
+</body>
+</html>

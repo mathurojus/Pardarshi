@@ -1,0 +1,173 @@
+{
+ "audit_id": "clean-d74410",
+ "site": "FairTix (demo)",
+ "provider": "opensource",
+ "created_at": "2026-10-15T06:27:30.175600Z",
+ "runs_total": 8,
+ "runs_ok": 8,
+ "trust_score": 100.0,
+ "findings": [],
+ "waterfalls": [
+  {
+   "persona_id": "base",
+   "persona": "US/desktop/new",
+   "n": 3,
+   "currency": "INR",
+   "advertised": 1164.0,
+   "final": 1164.0,
+   "drip_pct": 0,
+   "items": [
+    {
+     "label": "Ticket x 1",
+     "amount": 995.0,
+     "kind": "base",
+     "preselected": false
+    },
+    {
+     "label": "Convenience fee",
+     "amount": 80.0,
+     "kind": "fee",
+     "preselected": false
+    },
+    {
+     "label": "Service fee",
+     "amount": 40.0,
+     "kind": "fee",
+     "preselected": false
+    },
+    {
+     "label": "Processing fee",
+     "amount": 49.0,
+     "kind": "fee",
+     "preselected": false
+    }
+   ],
+   "screenshot": "shots/3453fb8a7b_2_payment.jpg",
+   "run": {
+    "run_id": "554267cabf",
+    "advertised": 1164.0,
+    "final": 1164.0,
+    "first_screenshot": "shots/c675fca414_0_event.jpg",
+    "stopped_at": "payment"
+   }
+  },
+  {
+   "persona_id": "iphone",
+   "persona": "US/iphone/new",
+   "n": 3,
+   "currency": "INR",
+   "advertised": 1169.0,
+   "final": 1169.0,
+   "drip_pct": 0,
+   "items": [
+    {
+     "label": "Ticket x 1",
+     "amount": 1000.0,
+     "kind": "base",
+     "preselected": false
+    },
+    {
+     "label": "Convenience fee",
+     "amount": 80.0,
+     "kind": "fee",
+     "preselected": false
+    },
+    {
+     "label": "Service fee",
+     "amount": 40.0,
+     "kind": "fee",
+     "preselected": false
+    },
+    {
+     "label": "Processing fee",
+     "amount": 49.0,
+     "kind": "fee",
+     "preselected": false
+    }
+   ],
+   "screenshot": "shots/2cf8f9730f_2_payment.jpg",
+   "run": {
+    "run_id": "c433dd5eb3",
+    "advertised": 1169.0,
+    "final": 1169.0,
+    "first_screenshot": "shots/eaf094a39f_0_event.jpg",
+    "stopped_at": "payment"
+   }
+  }
+ ],
+ "personalization": {
+  "advertised": {
+   "price_field": "advertised_price",
+   "n_runs": 6,
+   "baseline": {
+    "country": "US",
+    "device": "desktop",
+    "user_state": "new"
+   },
+   "effects": [
+    {
+     "factor": "device",
+     "level": "iphone",
+     "vs": "desktop",
+     "effect_pct": 0.25,
+     "ci_low_pct": -1.36,
+     "ci_high_pct": 1.9,
+     "p": 0.6871,
+     "p_adj": 0.6871,
+     "significant": false
+    }
+   ],
+   "any_significant": false,
+   "noise_pct": 0.72,
+   "note": "Residual noise (1 sd) is 0.72%. Effects are flagged only if p_adj < 0.05 and |effect| >= 2%.",
+   "df": 4
+  },
+  "final": {
+   "price_field": "final_price",
+   "n_runs": 6,
+   "baseline": {
+    "country": "US",
+    "device": "desktop",
+    "user_state": "new"
+   },
+   "effects": [
+    {
+     "factor": "device",
+     "level": "iphone",
+     "vs": "desktop",
+     "effect_pct": 0.25,
+     "ci_low_pct": -1.36,
+     "ci_high_pct": 1.9,
+     "p": 0.6871,
+     "p_adj": 0.6871,
+     "significant": false
+    }
+   ],
+   "any_significant": false,
+   "noise_pct": 0.72,
+   "note": "Residual noise (1 sd) is 0.72%. Effects are flagged only if p_adj < 0.05 and |effect| >= 2%.",
+   "df": 4
+  }
+ },
+ "friction": {
+  "cancel_clicks": 2.0,
+  "signup_clicks": 1.0,
+  "ratio": 2.0,
+  "screens": 3,
+  "interruption_screens": 0
+ },
+ "score_breakdown": [],
+ "notes": [],
+ "products": [
+  {
+   "name": "Indie Rock Night",
+   "url": "http://127.0.0.1:8100/clean/event/1",
+   "runs": 6,
+   "personas": [
+    "US/desktop/new",
+    "US/iphone/new"
+   ],
+   "used": true
+  }
+ ]
+}
