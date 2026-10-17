@@ -4,6 +4,31 @@
 
 **Agents that shop like you, and show what they were charged.** Built for AZINHACK '26 by team **RED-HAT**.
 
+## Runs live on TinyFish
+
+All four TinyFish APIs are integrated and were verified live on 16 Oct 2026. The Agent API has audited real Indian shops.
+
+| TinyFish API | What Pardarshi uses it for | Status |
+|---|---|---|
+| **Agent API** | Walks checkouts nobody scripted: a goal ("reach checkout, never pay") plus a typed output schema (every price line, pre-ticked flags, where it stopped) | ✅ Live on Indian shops |
+| **Browser API** | A cloud browser per shopper with a country proxy, driven over CDP by our own flows | ✅ Live (session with a German exit IP) |
+| **Fetch API** | Terms and refund pages as markdown for the policy-vs-reality check | ✅ Live (ran in the real-site audits) |
+| **Search API** | Peer sites for the Google ADK agent | ✅ Live |
+
+**On a live Indian shop:** the Agent API walked **bummer.in** from product page to cart to checkout and stopped at payment, without paying. It priced Modal Stretch Trunks at **₹599** (₹28.52 tax included) in 13 agent steps, for **$0.21** of TinyFish credit. Our open-source agent independently picked the same product at the same price.
+
+<table><tr>
+<td width="50%"><img src="docs/tinyfish_demo_1.png" alt="Pardarshi console showing an audit run through the TinyFish provider"></td>
+<td width="50%"><img src="docs/tinyfish_demo_2.png" alt="Pardarshi findings report from a TinyFish audit"></td>
+</tr><tr>
+<td align="center"><sub>Console: an audit run through the TinyFish provider on a live site</sub></td>
+<td align="center"><sub>The findings report generated from that audit</sub></td>
+</tr></table>
+
+<sub>The shop's name and figures are blurred on purpose. That audit's price figures came from a known bug, two units in the cart, and are not a finding against the shop. The fix is in progress.</sub>
+
+---
+
 Most "dark pattern" tools read one page. Pardarshi sends AI agents through the **whole** booking, checkout and cancellation flow as *different shoppers* (country, device, new vs returning), always **stopping before payment**, and then uses ML and statistics to report:
 
 <p align="center">
