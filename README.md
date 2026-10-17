@@ -32,6 +32,11 @@ All four TinyFish APIs are integrated and were verified live on 16 Oct 2026. The
 Most "dark pattern" tools read one page. Pardarshi sends AI agents through the **whole** booking, checkout and cancellation flow as *different shoppers* (country, device, new vs returning), always **stopping before payment**, and then uses ML and statistics to report:
 
 <p align="center">
+  <a href="https://youtu.be/SyPbXZ6AQbQ" target="_blank">
+    <img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch on YouTube">
+  </a>
+</p>
+<p align="center">
   <a href="https://youtu.be/SyPbXZ6AQbQ">
     <img src="https://img.youtube.com/vi/SyPbXZ6AQbQ/hqdefault.jpg" alt="Pardarshi Demo Video" width="480">
   </a>
