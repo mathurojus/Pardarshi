@@ -10,10 +10,10 @@ All four TinyFish APIs are integrated and were verified live on 16 Oct 2026. The
 
 | TinyFish API | What Pardarshi uses it for | Status |
 |---|---|---|
-| **Agent API** | Walks checkouts nobody scripted: a goal ("reach checkout, never pay") plus a typed output schema (every price line, pre-ticked flags, where it stopped) | ✅ Live on Indian shops |
-| **Browser API** | A cloud browser per shopper with a country proxy, driven over CDP by our own flows | ✅ Live (session with a German exit IP) |
-| **Fetch API** | Terms and refund pages as markdown for the policy-vs-reality check | ✅ Live (ran in the real-site audits) |
-| **Search API** | Peer sites for the Google ADK agent | ✅ Live |
+| **Agent API** | Walks checkouts nobody scripted: a goal ("reach checkout, never pay") plus a typed output schema (every price line, pre-ticked flags, where it stopped) |  Live on Indian shops |
+| **Browser API** | A cloud browser per shopper with a country proxy, driven over CDP by our own flows |  Live (session with a German exit IP) |
+| **Fetch API** | Terms and refund pages as markdown for the policy-vs-reality check |  Live (ran in the real-site audits) |
+| **Search API** | Peer sites for the Google ADK agent |  Live |
 
 **On a live Indian shop:** the Agent API walked **bummer.in** from product page to cart to checkout and stopped at payment, without paying. It priced Modal Stretch Trunks at **₹599** (₹28.52 tax included) in 13 agent steps, for **$0.21** of TinyFish credit. Our open-source agent independently picked the same product at the same price.
 
