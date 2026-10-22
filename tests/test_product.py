@@ -96,3 +96,13 @@ def test_real_sites_shop_as_a_local_indian_shopper():
     assert [p.id for p in loc] == [p.id for p in default_matrix()]
     assert BASELINE.country == "US"  # the demo shop's matrix is unchanged
     assert LOCALES["IN"] == ("en-IN", "Asia/Kolkata")
+
+
+def test_runs_with_two_units_are_left_out_of_price_comparisons():
+    # found live on bummer.in: an agent added the item twice (₹1,198 - 10% = ₹1,078), which is not a price change
+    one = [_run(f"a{i}", "Blue Kurta", 999, 1099) for i in range(3)]
+    two = _run("b", "Blue Kurta", 999, 1978, IPHONE)
+    two.meta["quantity"] = 2
+    rep = analyze("q", "shop.in", "opensource", one + [two], get_classifier())
+    assert any("more than one unit" in n for n in rep.notes)
+    assert not any(f.type == "personalization" for f in rep.findings)

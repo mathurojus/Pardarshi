@@ -39,6 +39,22 @@ def specs_for(site: str, flows: tuple[str, ...] = ("purchase", "cancel"), sessio
                      intent="Pick the first product, add it to the cart and go as far towards payment as possible")]
 
 
+MAX_PRODUCTS = 5
+_ORDINAL = ["first", "second", "third", "fourth", "fifth"]
+
+
+def product_specs(spec: FlowSpec, n: int) -> list[FlowSpec]:
+    """One purchase spec per product slot. Scripted shops pick the n-th listing; real sites get a goal naming it."""
+    out = [spec]
+    for k in range(1, n):
+        intent = spec.intent
+        if not spec.script:
+            intent = (f"Pick the {_ORDINAL[k]} product listed (not the first), add it to the cart and go as far "
+                      "towards payment as possible")
+        out.append(spec.model_copy(update={"product_index": k, "intent": intent}))
+    return out
+
+
 def audit_label(site: str) -> str:
     return {"dirty": "TicketNest (demo)", "clean": "FairTix (demo)"}.get(site, site)
 
@@ -65,6 +81,7 @@ async def run_audit(
     audit_id: str | None = None,
     with_policy: bool = True,
     session_file: str | None = None,
+    products: int = 1,
 ) -> AuditReport:
     emit = on_event or (lambda e: None)
     store = store or AuditStore()
@@ -82,7 +99,11 @@ async def run_audit(
         jobs: list[tuple[FlowSpec, Persona, int]] = []
         if session_file:  # one signed-in account: one shopper, one run (a shared cart would mix repeats)
             personas, repeats = [base], 1
+        products = 1 if session_file else max(1, min(MAX_PRODUCTS, products))
+        specs: list[FlowSpec] = []
         for spec in specs_for(site, flows, session_file):
+            specs += product_specs(spec, products) if spec.flow == "purchase" else [spec]
+        for spec in specs:
             usable = [p for p in personas
                       if (p.country == base.country or _supports_country(providers, spec))
                       and (p.device == "desktop" or _supports_device(providers, spec))]
@@ -93,9 +114,12 @@ async def run_audit(
             else:
                 reps = repeats
             jobs += [(spec, p, i) for p in usable for i in range(reps)]
-        key = lambda spec, p, i: f"{spec.flow}:{p.id}:{i}"  # noqa: E731
+        key = lambda spec, p, i: (f"{spec.flow}:{p.id}:{i}" if not spec.product_index  # noqa: E731
+                                  else f"{spec.flow}:{p.id}:{i}:p{spec.product_index}")
         emit({"type": "started", "audit_id": audit_id, "total": len(jobs), "provider": providers.name, "site": site,
-              "jobs": [{"key": key(s, p, i), "flow": s.flow, "persona": p.label, "persona_id": p.id, "repeat": i}
+              "products": products,
+              "jobs": [{"key": key(s, p, i), "flow": s.flow, "persona": p.label, "persona_id": p.id, "repeat": i,
+                        "product": s.product_index}
                        for s, p, i in jobs]})
         # Run order: in rounds (every profile's 1st run, then every profile's 2nd...), shuffled within a round.
         # A price that drifts over time then hits all profiles alike instead of posing as personalised pricing.
@@ -110,7 +134,7 @@ async def run_audit(
         done = 0
         runs: list[RunRecord] = []
 
-        async def one(spec: FlowSpec, p: Persona, i: int) -> None:
+        async def one(spec: FlowSpec, p: Persona, i: int) -> RunRecord:
             nonlocal done
             k = key(spec, p, i)
             STEP_HOOK.set(lambda name: emit({"type": "step", "key": k, "step": name}))  # this task only
@@ -119,39 +143,50 @@ async def run_audit(
             done += 1
             prod = product_of(run) if spec.flow == "purchase" and run.ok else None
             emit({"type": "run", "key": k, "steps": [st.name for st in run.steps], "stopped_at": run.stopped_at, "done": done, "total": len(jobs), "flow": spec.flow, "persona": p.label,
-                  "repeat": i, "ok": run.ok, "error": run.error, "final_price": run.final_price,
+                  "repeat": i, "product_slot": spec.product_index, "ok": run.ok, "error": run.error, "final_price": run.final_price,
                   "product": prod and {"name": prod["name"], "url": prod["url"]}})
+            return run
 
         async def run_all(js: list) -> None:
-            if any(s.polite for s, _, _ in js):  # real sites: one shopper at a time, never a burst of sessions
+            if any(s.polite for s, _, _ in js):
+                # Real sites: each product is its own lane. Inside a lane one shopper at a time, never a burst of
+                # sessions on the same site; the lanes (at most MAX_PRODUCTS) run side by side.
+                lanes: dict[int, list] = {}
                 for j in js:
-                    await one(*j)
+                    lanes.setdefault(j[0].product_index if j[0].flow == "purchase" else -1, []).append(j)
+
+                async def lane(lane_jobs: list) -> None:
+                    for j in lane_jobs:
+                        await one(*j)
+
+                await asyncio.gather(*(lane(l) for l in lanes.values()))
             else:
                 await asyncio.gather(*(one(*j) for j in js))
 
-        # Same product for every shopper: on a site without a script, the baseline shopper's first run picks a
-        # product; every other purchase run then starts on that exact product page instead of choosing its own
+        # Same product for every shopper: on a site without a script, each product slot's baseline first run (the
+        # pilot) picks a product; every other purchase run of that slot then starts on that exact product page
         # (listings differ by device, location and visitor, so "the first product" can be a different item).
-        at = next((n for n, (s, p, i) in enumerate(jobs) if s.flow == "purchase" and not s.script and not s.product_url
-                   and p.id == BASELINE.id and i == 0), None)
-        if at is not None and len(jobs) > 1:
-            pilot = jobs[at]
-            await one(*pilot)
-            rest = jobs[:at] + jobs[at + 1:]
-            prod = product_of(runs[-1]) if runs[-1].ok else None
-            pinned = None
-            if prod and prod["url"]:
-                try:
-                    ensure_allowed(prod["url"])
-                    pinned = pilot[0].model_copy(update={
+        # The pilots of different slots run in parallel, one agent per product.
+        pilots = [j for j in jobs if j[0].flow == "purchase" and not j[0].script and not j[0].product_url
+                  and j[1].id == BASELINE.id and j[2] == 0]
+        if pilots and len(jobs) > 1:
+            pilot_runs = await asyncio.gather(*(one(*j) for j in pilots))
+            pinned_for: dict[int, FlowSpec] = {}
+            for (pspec, _, _), prun in zip(pilots, pilot_runs):
+                prod = product_of(prun) if prun.ok else None
+                if prod and prod["url"]:
+                    try:
+                        ensure_allowed(prod["url"])
+                    except PermissionError:
+                        continue
+                    pinned_for[pspec.product_index] = pspec.model_copy(update={
                         "product_url": prod["url"],
                         "intent": f"This page is the product '{prod['name']}'. Add exactly this product to the cart and go "
                                   "as far towards payment as possible. Do not switch to a different product."})
-                except PermissionError:
-                    pinned = None
-            if pinned:
-                emit({"type": "pinned", "product": {"name": prod["name"], "url": prod["url"]}})
-                rest = [(pinned if s is pilot[0] else s, p, i) for s, p, i in rest]
+                    emit({"type": "pinned", "slot": pspec.product_index, "product": {"name": prod["name"], "url": prod["url"]}})
+            pilot_ids = {id(j) for j in pilots}
+            rest = [(pinned_for.get(j[0].product_index, j[0]) if j[0].flow == "purchase" else j[0], j[1], j[2])
+                    for j in jobs if id(j) not in pilot_ids]
             await run_all(rest)
         else:
             await run_all(jobs)

@@ -50,18 +50,20 @@ def _summ(report) -> dict:
 
 
 # ----------------------------------------------------------------------------- tools
-async def run_audit_tool(site: str, quick: bool = True) -> dict:
+async def run_audit_tool(site: str, quick: bool = True, products: int = 1) -> dict:
     """Audit a website by sending browser personas (different device, country, new/returning user) through its
     booking flow up to (never including) payment, and through its cancellation flow when available.
     Args:
       site: 'dirty' or 'clean' for the built-in demo shops, or a hostname that is on the allowlist.
+      products: how many products (1 to 5) to audit side by side, each in its own parallel lane.
       quick: True runs 2 personas (fast, cheap); False runs the full 6-persona matrix (slower).
     Returns the audit id, the 0-100 transparency score and the findings (drip pricing, dark patterns,
     personalised pricing, cancellation friction, policy contradictions)."""
     providers = get_providers(store=_store)
     try:
         report = await run_audit(site, providers=providers, store=_store, repeats=3,
-                                 personas=quick_matrix() if quick else default_matrix())
+                                 personas=quick_matrix() if quick else default_matrix(),
+                                 products=max(1, min(5, int(products))))
         auth.set_owner(report.audit_id, auth.CURRENT_USER.get())
         return _summ(report)
     except AuditInconclusive as e:  # let the agent explain it rather than report a score for nothing measured

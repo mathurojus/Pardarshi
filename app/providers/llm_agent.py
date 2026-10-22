@@ -16,7 +16,7 @@ from playwright.async_api import Error as PlaywrightError
 from app import llm
 from app.capture.schema import FlowSpec, Persona
 from app.config import settings
-from app.ml.price_extract import final_total, headline_price
+from app.ml.price_extract import cart_quantity, final_total, headline_price
 from app.providers.scripts import Recorder
 
 LIST_JS = r"""
@@ -61,6 +61,8 @@ SYSTEM = (
     "Rules: never enter card, bank, password, OTP, email, phone, name or address. You may type only into search "
     "or route/city/destination boxes. Never press a button that pays, places or confirms an order. "
     "Prefer the path that shows the full price breakdown (product page, add to cart, view cart or checkout summary). "
+    "Add exactly ONE unit of ONE product: once it is in the cart or bag, never press add-to-cart or buy-now again; "
+    "go to the cart or checkout instead. If the cart already shows the price breakdown and nothing new can be reached, answer done. "
     "When the page asks for card or payment details, or to log in or give personal details, answer action=done."
 )
 
@@ -85,6 +87,9 @@ def finish_run(run, steps, hit_payment_form: bool, stop_reason: str = "", first_
     run.final_price = final_total(last_total.prices) if last_total else None
     if last_total:
         run.meta["price_step"] = last_total.index
+        qty = cart_quantity(last_total.text)
+        if qty:
+            run.meta["quantity"] = qty
     if stop_reason:
         run.meta["stop_reason"] = stop_reason
 
@@ -133,6 +138,7 @@ async def run_goal_agent(rec: Recorder, spec: FlowSpec, persona: Persona) -> Non
     page, run = rec.page, rec.run
     await rec.goto(spec.product_url or spec.base_url)  # a pinned product: every shopper checks the same item
     history: list[str] = []
+    acts: list[tuple] = []
     stop = "max_steps"
     for i in range(settings.max_steps):
         step = await rec.snap(f"step{i}", check_timer_reload=(i == 1))
@@ -170,6 +176,10 @@ async def run_goal_agent(rec: Recorder, spec: FlowSpec, persona: Persona) -> Non
                 break
         action, target = d.get("action"), d.get("target")
         history.append(f"{action} {target if target is not None else ''} ({d.get('reason', '')[:50]})")
+        acts.append((action, target, step.url))
+        if len(acts) >= 3 and len(set(acts[-3:])) == 1:  # the same click on the same page three times: stuck
+            stop = "stuck"
+            break
         if action == "done":
             stop = "agent_done"
             break

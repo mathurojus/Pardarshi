@@ -85,3 +85,17 @@ def test_false_positive_rate_is_controlled():
 def test_too_few_runs_is_graceful():
     res = personalization.analyse(_runs({}, reps=1)[:3])
     assert res["effects"] == [] and "Not enough" in res["note"]
+
+
+def test_promo_thresholds_are_not_the_product_price():
+    # found live on bummer.in: the banner's "Free Socks ₹1499+" was read as the advertised price
+    page = "Extra 10% off on 999+ | Free Socks ₹1499+ | Free Shipping ₹699+\nModal Stretch Trunks\n₹599"
+    assert headline_price(page)[0] == 599.0
+    assert headline_price("You're ₹421 away from unlocking Free Socks\nTrunks\n₹599")[0] == 599.0
+
+
+def test_cart_quantity_is_read_from_the_page():
+    from app.ml.price_extract import cart_quantity
+    assert cart_quantity("IN YOUR BAG\n2 items\nCart total ₹1,078") == 2
+    assert cart_quantity("Qty: 1\nTotal ₹599") == 1
+    assert cart_quantity("Total ₹599") is None

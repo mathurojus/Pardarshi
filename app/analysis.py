@@ -79,6 +79,35 @@ def same_product(purchase_runs: list[RunRecord]) -> tuple[list[RunRecord], list[
     return keep, summary, note
 
 
+MIN_RUNS_PER_PRODUCT = 3
+
+
+def product_groups(purchase_runs: list[RunRecord]) -> dict[str, tuple[dict, list[RunRecord]]]:
+    """Measured runs grouped by the product they priced, only products with enough runs to compare shoppers."""
+    groups: dict[str, list[RunRecord]] = defaultdict(list)
+    info: dict[str, dict] = {}
+    for r in purchase_runs:
+        p = product_of(r) if r.ok else None
+        if p:
+            groups[p["key"]].append(r)
+            info.setdefault(p["key"], p)
+    return {k: (info[k], rs) for k, rs in sorted(groups.items(), key=lambda kv: -len(kv[1]))
+            if len(rs) >= MIN_RUNS_PER_PRODUCT}
+
+
+def _merge(pairs: list[tuple[str, Finding]], total: int) -> Finding | None:
+    """One finding per kind across products: the worst product leads, the others are named, the score counts it once."""
+    if not pairs:
+        return None
+    pairs = sorted(pairs, key=lambda t: -t[1].penalty)
+    name, f = pairs[0]
+    f.title += f" (on {len(pairs)} of {total} products)"
+    f.detail += f" Product: {name}." + (f" Also on: {', '.join(n for n, _ in pairs[1:])}." if len(pairs) > 1 else "")
+    f.evidence = f.evidence + [e for _, g in pairs[1:3] for e in g.evidence[:1]]
+    f.metrics = {**f.metrics, "products": [{"name": n, **{k: v for k, v in g.metrics.items() if k != "effects"}} for n, g in pairs]}
+    return f
+
+
 def _ev(run: RunRecord, step: Step | None, text: str = "") -> Evidence:
     return Evidence(run_id=run.run_id, step_name=step.name if step else "", text=text,
                     screenshot=step.screenshot if step else None)
@@ -293,14 +322,40 @@ def analyze(audit_id: str, site: str, provider: str, runs: list[RunRecord], clf:
             "Their payable price is the furthest total the site showed (for example the cart summary); "
             "charges added after that step are not covered.")
 
-    priced, report.products, mixed = same_product(purchase)  # compare prices of one product only
-    if mixed:
-        report.notes.append(mixed)
+    multi = [r for r in purchase if r.ok and (r.meta.get("quantity") or 1) > 1]
+    if multi:  # a cart with 2 units is not a price change: compare single-unit runs only
+        purchase = [r for r in purchase if r not in multi]
+        report.notes.append(f"{len(multi)} run(s) ended with more than one unit in the cart and were left out of the "
+                            "price comparisons.")
+    groups = product_groups(purchase)
+    multi = len(groups) >= 2  # several products audited side by side: analyse each, then merge per finding kind
+    if multi:
+        priced = [r for _, rs in groups.values() for r in rs]
+        report.products = [
+            {"name": info["name"], "url": info["url"], "runs": len(rs), "personas": sorted({r.persona.label for r in rs}),
+             "used": True, "advertised": round(_median([r.advertised_price for r in rs]), 2),
+             "final": round(_median([r.final_price for r in rs]), 2),
+             "drip_pct": round((drip_ratio(_median([r.advertised_price for r in rs]), _median([r.final_price for r in rs])) or 0) * 100, 1)}
+            for info, rs in groups.values()]
+        left = sum(1 for r in purchase if r.ok) - len(priced)
+        report.notes.append(f"{len(groups)} products audited side by side; each is compared only with itself."
+                            + (f" {left} run(s) on products with fewer than {MIN_RUNS_PER_PRODUCT} runs were left out." if left else ""))
+    else:
+        priced, report.products, mixed = same_product(purchase)  # compare prices of one product only
+        if mixed:
+            report.notes.append(mixed)
 
     findings: list[Finding] = []
-    for f in (drip_finding(priced), basket_finding(purchase)):
-        if f:
-            findings.append(f)
+    if multi:
+        names = [(info["name"], rs) for info, rs in groups.values()]
+        for fn in (drip_finding, basket_finding):
+            f = _merge([(n, x) for n, rs in names if (x := fn(rs))], len(names))
+            if f:
+                findings.append(f)
+    else:
+        for f in (drip_finding(priced), basket_finding(purchase)):
+            if f:
+                findings.append(f)
     skip = {"preselected_addon"} if any(f.id == "basket_sneaking" for f in findings) else set()
     urgency = urgency_signal_finding(purchase)
     pats = pattern_findings(runs, clf, skip)
@@ -308,7 +363,13 @@ def analyze(audit_id: str, site: str, provider: str, runs: list[RunRecord], clf:
         pats = [p for p in pats if p.id != urgency.id]
         pats.append(urgency)
     findings += pats
-    pf, report.personalization = personalization_finding(priced)
+    if multi:
+        per = [(n, *personalization_finding(rs)) for n, rs in names]
+        lead = max((t for t in per if t[1]), key=lambda t: t[1].penalty, default=per[0])
+        report.personalization = lead[2]
+        pf = _merge([(n, f) for n, f, _ in per if f], len(names))
+    else:
+        pf, report.personalization = personalization_finding(priced)
     if pf:
         findings.append(pf)
     ff, report.friction = friction_finding(cancel, clf)
@@ -316,7 +377,10 @@ def analyze(audit_id: str, site: str, provider: str, runs: list[RunRecord], clf:
         findings.append(ff)
 
     report.findings = findings
-    report.waterfalls = waterfalls(priced)
+    if multi:
+        report.waterfalls = [{**w, "persona": f"{w['persona']} · {n}"} for n, rs in names for w in waterfalls(rs)]
+    else:
+        report.waterfalls = waterfalls(priced)
     rescore(report)
     return report
 

@@ -146,14 +146,14 @@ class TinyFishAgent:
     name = "tinyfish"
 
     def __init__(self, store: AuditStore | None = None, api_key: str | None = None, lane: str | None = None,
-                 concurrency: int = 4):
+                 concurrency: int | None = None):
         self.store = store or AuditStore()
         self.api_key = api_key or settings.tinyfish_api_key
         if not self.api_key:
             raise RuntimeError("TINYFISH_API_KEY is not set")
         self.lane = (lane or os.getenv("TINYFISH_LANE", "auto")).lower()
         self.client = AsyncTinyFish(api_key=self.api_key)
-        self._sem = asyncio.Semaphore(concurrency)
+        self._sem = asyncio.Semaphore(concurrency or settings.max_parallel)
 
     # country proxies exist for every persona we use; device emulation needs our own Playwright (browser lane)
     def supports_country(self, spec: FlowSpec) -> bool:
@@ -170,7 +170,7 @@ class TinyFishAgent:
         lane = self._lane_for(spec)
         run = RunRecord(run_id=uuid.uuid4().hex[:10], audit_id=audit_id, site=spec.site, flow=spec.flow,
                         persona=persona, provider=self.name, repeat=repeat)
-        run.meta.update(lane=lane, country_effective=persona.country)
+        run.meta.update(lane=lane, country_effective=persona.country, product_slot=spec.product_index)
         if spec.session_file:  # a saved sign-in never leaves this machine
             run.error = "Own-account sessions run only on the open-source provider."
             self.store.save_run(run)

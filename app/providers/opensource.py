@@ -40,9 +40,9 @@ def ensure_allowed(url: str) -> None:
 class PlaywrightAgent:
     name = "opensource"
 
-    def __init__(self, store: AuditStore | None = None, concurrency: int = 4):
+    def __init__(self, store: AuditStore | None = None, concurrency: int | None = None):
         self.store = store or AuditStore()
-        self._sem = asyncio.Semaphore(concurrency)
+        self._sem = asyncio.Semaphore(concurrency or settings.max_parallel)
         self._pw = None
         self._browser = None
         self._lock = asyncio.Lock()
@@ -80,6 +80,7 @@ class PlaywrightAgent:
         ensure_allowed(spec.base_url)
         run = RunRecord(run_id=uuid.uuid4().hex[:10], audit_id=audit_id, site=spec.site, flow=spec.flow,
                         persona=persona, provider=self.name, repeat=repeat)
+        run.meta["product_slot"] = spec.product_index
         run.meta["country_effective"] = persona.country if self.supports_country(spec) else "local"
         async with self._sem:
             browser = await self._browser_()

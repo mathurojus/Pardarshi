@@ -115,3 +115,21 @@ async def test_own_session_runs_one_shopper_once_and_says_so(tmp_path):
     assert any("login or personal-details step" in n for n in rep.notes)
     drip = next(f for f in rep.findings if f.id == "drip_pricing")
     assert drip.title.endswith("the checkout summary")
+
+
+async def test_several_products_run_side_by_side(patch_shop, tmp_path):
+    store = AuditStore(tmp_path)
+    providers = get_providers("opensource", store)
+    events = []
+    try:
+        rep = await run_audit("dirty", providers=providers, store=store, repeats=3, with_policy=False,
+                              products=4, on_event=events.append)
+    finally:
+        await providers.aclose()
+    started = next(e for e in events if e["type"] == "started")
+    assert started["products"] == 4 and {j["product"] for j in started["jobs"]} == {0, 1, 2, 3}
+    assert len({j["key"] for j in started["jobs"]}) == started["total"]  # every lane has unique run keys
+    assert rep.runs_ok == rep.runs_total
+    assert len(rep.products) == 4 and all(p["used"] and p["runs"] >= 3 for p in rep.products)
+    drip = next(f for f in rep.findings if f.id == "drip_pricing")
+    assert "4 of 4 products" in drip.title and len(drip.metrics["products"]) == 4

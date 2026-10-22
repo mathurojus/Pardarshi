@@ -166,7 +166,7 @@ $("run").onclick = async () => {
   $("progressTitle").textContent = "Starting agents";
   $("progressCount").textContent = "";
   try {
-    const { audit_id } = await post("/api/audits", { site, provider, quick: $("quick").checked, use_session: useSession });
+    const { audit_id } = await post("/api/audits", { site, provider, quick: $("quick").checked, products: +$("products").value, use_session: useSession });
     watch(audit_id);
   } catch (e) {
     $("progressTitle").textContent = "Could not start: " + e.message;
@@ -179,19 +179,19 @@ $("run").onclick = async () => {
 const STEP_TEXT = { event: "Reading the product page", cart: "Reviewing the basket", payment: "At payment, not paying",
   signed_up: "Signed up for a trial", confirm: "Confirming cancellation", done: "Finished" };
 const stepText = (s) => STEP_TEXT[s] || cap(String(s).replace(/_/g, " "));
-const AG = { cards: new Map(), pips: new Map() };
+const AG = { cards: new Map(), pips: new Map(), pinned: [] };
 
 function buildAgents(jobs) {
   const box = $("agents");
   box.replaceChildren();
-  AG.cards.clear(); AG.pips.clear();
+  AG.cards.clear(); AG.pips.clear(); AG.pinned = [];
   for (const j of jobs) {
-    const g = `${j.flow}:${j.persona_id}`;
+    const g = `${j.flow}:${j.persona_id}:${j.product || 0}`;
     if (!AG.cards.has(g)) {
       const name = personaName(j);
       const el = document.createElement("div");
       el.className = "agent";
-      el.innerHTML = `<div class="ag-head"><span class="ag-av" aria-hidden="true">${esc(name.charAt(0))}</span><div class="ag-who"><b>${esc(name)}</b><small>${esc(j.persona.replace(/\//g, " · "))}</small></div><span class="ag-flow">${j.flow === "cancel" ? "cancel" : "buy"}</span></div>
+      el.innerHTML = `<div class="ag-head"><span class="ag-av" aria-hidden="true">${esc(name.charAt(0))}</span><div class="ag-who"><b>${esc(name)}</b><small>${esc(j.persona.replace(/\//g, " · "))}</small></div><span class="ag-flow">${j.flow === "cancel" ? "cancel" : "buy" + (j.product ? " #" + (j.product + 1) : "")}</span></div>
         <div class="ag-step"><i class="ag-dot"></i><span>Queued</span></div>
         <div class="ag-prod" hidden></div>
         <div class="ag-foot"><span class="ag-pips"></span><b class="ag-price"></b></div>`;
@@ -267,7 +267,10 @@ function watch(id) {
     if (e.type === "step") agentStep(e.key, e.step);
     if (e.type === "pinned") {
       $("pinned").hidden = false;
-      $("pinned").innerHTML = `Every shopper now checks the same product: <b>${esc(e.product.name)}</b>`;
+      AG.pinned.push(e.product.name);
+      $("pinned").innerHTML = AG.pinned.length > 1
+        ? `Each parallel lane checks its own product: ${AG.pinned.map((n) => `<b>${esc(n)}</b>`).join(" · ")}`
+        : `Every shopper now checks the same product: <b>${esc(e.product.name)}</b>`;
     }
     if (e.type === "run") {
       $("barfill").style.width = `${Math.round((e.done / e.total) * 88) + 6}%`;

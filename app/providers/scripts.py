@@ -58,7 +58,7 @@ async def ticketshop_purchase(rec: Recorder, base_url: str, persona: Persona) ->
     await rec.goto(base_url + "/")
     if persona.user_state == "returning":
         await rec.goto(base_url + "/")  # a second visit: the shop now sees a returning visitor
-    await rec.click(page.locator("a[href*='/event/']"))
+    await rec.click(page.locator("a[href*='/event/']").nth(int(rec.run.meta.get("product_slot") or 0)))
     event = await rec.snap("event", check_timer_reload=True)
     adv, cur = headline_price(event.text)
     rec.run.advertised_price, rec.run.currency = adv, cur

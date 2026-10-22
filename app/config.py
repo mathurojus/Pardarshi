@@ -28,6 +28,8 @@ class Settings:
     max_steps: int = int(os.getenv("MAX_AGENT_STEPS", "25"))
     # Polite mode (real sites): one shopper at a time and a human-like pause between actions.
     polite_delay: tuple[float, float] = (float(os.getenv("POLITE_MIN_DELAY", "1.5")), float(os.getenv("POLITE_MAX_DELAY", "4.0")))
+    # Parallel shopper agents: browser sessions allowed at once (demo shops run every shopper concurrently).
+    max_parallel: int = int(os.getenv("MAX_PARALLEL", "20"))
     home_country: str = os.getenv("HOME_COUNTRY", "IN").upper()  # where real-site audits on this machine are seen from
     # Comma-separated hostnames the auditor may visit. The demo shop is always allowed.
     allowed_hosts: tuple[str, ...] = field(

@@ -93,9 +93,28 @@ def extract_items(text: str) -> list[PriceItem]:
     return items
 
 
+# Promotion banners and cart nudges quote thresholds, not the product's price ("Free Socks ₹1499+",
+# "You're ₹421 away from free shipping", "Extra 10% off on orders above ₹999").
+PROMO_LINE = re.compile(
+    r"(₹|rs\.?|inr)\s?\d[\d,]*(\.\d+)?\s*\+|\baway from\b|\bunlock|\bfree\s+(shipping|delivery|gift|socks)\b|"
+    r"\b(orders?|purchases?|shopping)\s+(above|over|of)\b|\b(above|over)\s+(₹|rs)|\bmin(imum)?\s+(order|purchase|cart)\b|"
+    r"\buse\s+code\b|\bcoupon\b", re.I)
+# "2 items", "Qty: 2", "Quantity 2", "Total items in cart: 2"
+QTY_RE = re.compile(r"\b(\d{1,2})\s+items?\b|\bqty\s*:?\s*(\d{1,2})\b|\bquantity\s*:?\s*(\d{1,2})\b", re.I)
+
+
+def cart_quantity(text: str) -> int | None:
+    """Units in the cart as the page states it (largest stated count), or None if the page does not say."""
+    counts = [int(next(g for g in m.groups() if g)) for m in QTY_RE.finditer(text)]
+    counts = [c for c in counts if c > 0]
+    return max(counts) if counts else None
+
+
 def headline_price(text: str) -> tuple[float | None, str]:
-    """First money amount on the page: the price a shopper is shown first."""
+    """First money amount on the page, skipping promotion thresholds: the price a shopper is shown first."""
     for ln in text.splitlines():
+        if PROMO_LINE.search(ln):
+            continue
         amts = parse_amounts(ln)
         if amts:
             return amts[0][0], amts[0][1]

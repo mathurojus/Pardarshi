@@ -101,6 +101,7 @@ class AuditRequest(BaseModel):
     site: str = Field(default="dirty", max_length=200)
     provider: str | None = None  # "opensource" | "tinyfish"; default from PROVIDER
     repeats: int = Field(default=3, ge=1, le=5)
+    products: int = Field(default=1, ge=1, le=5)  # products audited side by side, one parallel lane each
     quick: bool = False  # 2 personas instead of 6: cheaper for live demos / credits
     with_policy: bool = True
     use_session: bool = False  # audit behind the login with the user's own saved sign-in (scripts/connect_account)
@@ -183,7 +184,7 @@ async def start_audit(req: AuditRequest, user=Depends(auth.require_user)):
             providers = get_providers(req.provider, store)
             await run_audit(req.site, providers=providers, store=store, audit_id=audit_id, repeats=req.repeats,
                             personas=quick_matrix() if req.quick else default_matrix(), on_event=job["events"].append,
-                            with_policy=req.with_policy, session_file=session_file)
+                            with_policy=req.with_policy, session_file=session_file, products=req.products)
         except AuditInconclusive as e:
             job["error"] = str(e)[:400]
             job["events"].append({"type": "error", "message": job["error"]})

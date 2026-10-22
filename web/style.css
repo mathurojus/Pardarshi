@@ -332,3 +332,5 @@ textarea { width: 100%; min-height: 340px; padding: 12px; border-radius: 10px; b
   .hero { padding: 20px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+.products { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; padding-bottom: 8px; }
+.products select { font: inherit; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--line, #8884); background: transparent; color: inherit; }

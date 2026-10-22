@@ -124,6 +124,7 @@ class FlowSpec(BaseModel):
     script: str | None = None  # name of a built-in deterministic script, if any
     session_file: str | None = None  # the account holder's own saved sign-in (open-source lane only)
     product_url: str | None = None  # pinned product page: every shopper checks this exact product
+    product_index: int = 0  # which listed product this spec checks (0 = first); several run side by side
     polite: bool = False  # real sites: one shopper at a time, human-like pauses between actions
 
 

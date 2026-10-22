@@ -137,7 +137,10 @@ EVENTS = [
     {"id": 1, "name": "Indie Rock Night", "when": "Sat 8 Nov, 7pm", "venue": "Riverside Arena", "teaser": "Live music"},
     {"id": 2, "name": "Stand-up Special", "when": "Sun 9 Nov, 6pm", "venue": "City Hall", "teaser": "Comedy"},
     {"id": 3, "name": "Jazz in the Park", "when": "Fri 14 Nov, 5pm", "venue": "Central Park", "teaser": "Open air"},
+    {"id": 4, "name": "Classical Evening", "when": "Sat 15 Nov, 7pm", "venue": "Opera House", "teaser": "Orchestra"},
+    {"id": 5, "name": "Food and Music Fest", "when": "Sun 16 Nov, 12pm", "venue": "Harbour Lawn", "teaser": "Street food"},
 ]
+EVENT_PRICE = {1: 1.0, 2: 0.8, 3: 1.2, 4: 1.5, 5: 0.9}  # each event has its own base price
 
 env = Environment(loader=DictLoader(T), autoescape=select_autoescape(["html"]))
 
@@ -216,7 +219,7 @@ def home(profile: str, request: Request):
 def event(profile: str, eid: int, request: Request):
     shop = _shop(profile)
     ev = next(e for e in EVENTS if e["id"] == eid)
-    base = round(personalised_base(shop, detect(request)))
+    base = round(personalised_base(shop, detect(request)) * EVENT_PRICE.get(eid, 1.0))
     if shop["honest"]:
         headline = base + sum(a for _, a in fee_lines(shop, base))
     else:
